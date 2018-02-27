@@ -1,47 +1,4 @@
-----------
-#2018-02-27 更新
 
-1.解决需要点击两次才能刷新的bug（感谢评论区里面的小伙伴）
-2.提供滚动到指定页面的方法，可以配合数据刷新。
-
-```
-	   myAdapter.notifyDataSetChanged();
-        //滚动到第一页
-        scrollHelper.scrollToPosition(0);
-```
-3.提供获取总页数的方法。目前支持的有LinearLayoutManager，StaggeredGridLayoutManager，HorizontalPageLayoutManager（我自己写的）,如果你想自己的LayoutManger也能获取到总页数，请实现相应的方法。
-下面三个是能横向滚动的LayoutManger,能竖直滚动的有对应的三个方法。
-
-```
-  @Override
-    public int computeHorizontalScrollRange(RecyclerView.State state) {
-       return 0;
-    }
-
-    @Override
-    public int computeHorizontalScrollOffset(RecyclerView.State state) {
-        return 0;
-    }
-
-    @Override
-    public int computeHorizontalScrollExtent(RecyclerView.State state) {
-        return 0;
-    }
-```
-获取总页数的方法
-
-```
- //获取总页数,采用这种方法才能获得正确的页数。否则会因为RecyclerView.State 缓存问题，页数不正确。
- //第一次，和每一次更新adapter以后。需要使用这样的方法获取。
-        recyclerView.post(new Runnable() {
-            @Override
-            public void run() {
-                tv_page_total.setText("共" + scrollHelper.getPageCount() + "页");
-            }
-        });
-```
-
-最后的最后，感谢小伙伴的支持。没想到这几百行的小工具这么收欢迎。大家还有bug，欢迎反馈。
 
 # HorizontalPage
 一行代码让RecyclerView变身ViewPager
@@ -121,3 +78,48 @@
             return false;
         }
 ```
+
+----------
+#2018-02-27 更新
+
+1.解决需要点击两次才能刷新的bug（感谢评论区里面的小伙伴）
+2.提供滚动到指定页面的方法，可以配合数据刷新。
+
+```
+	   myAdapter.notifyDataSetChanged();
+        //滚动到第一页
+        scrollHelper.scrollToPosition(0);
+```
+3.提供获取总页数的方法。目前支持的有LinearLayoutManager，StaggeredGridLayoutManager，HorizontalPageLayoutManager（我自己写的）,如果你想自己的LayoutManger也能获取到总页数，请实现相应的方法。
+下面三个是能横向滚动的LayoutManger,能竖直滚动的有对应的三个方法。
+
+```
+  @Override
+    public int computeHorizontalScrollRange(RecyclerView.State state) {
+       return 0;
+    }
+
+    @Override
+    public int computeHorizontalScrollOffset(RecyclerView.State state) {
+        return 0;
+    }
+
+    @Override
+    public int computeHorizontalScrollExtent(RecyclerView.State state) {
+        return 0;
+    }
+```
+获取总页数的方法
+
+```
+ //获取总页数,采用这种方法才能获得正确的页数。否则会因为RecyclerView.State 缓存问题，页数不正确。
+ //第一次，和每一次更新adapter以后。需要使用这样的方法获取。
+        recyclerView.post(new Runnable() {
+            @Override
+            public void run() {
+                tv_page_total.setText("共" + scrollHelper.getPageCount() + "页");
+            }
+        });
+```
+
+最后的最后，感谢小伙伴的支持。没想到这几百行的小工具这么收欢迎。大家还有bug，欢迎反馈。
