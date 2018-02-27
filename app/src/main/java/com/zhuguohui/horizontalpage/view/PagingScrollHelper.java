@@ -31,7 +31,7 @@ public class PagingScrollHelper {
         HORIZONTAL, VERTICAL, NULL
     }
 
-    ORIENTATION mOrientation = ORIENTATION.HORIZONTAL;
+    private ORIENTATION mOrientation = ORIENTATION.HORIZONTAL;
 
     public void setUpRecycleView(RecyclerView recycleView) {
         if (recycleView == null) {
@@ -46,6 +46,7 @@ public class PagingScrollHelper {
         recycleView.setOnTouchListener(mOnTouchListener);
         //获取滚动的方向
         updateLayoutManger();
+
     }
 
     public void updateLayoutManger() {
@@ -70,7 +71,45 @@ public class PagingScrollHelper {
 
     }
 
+    /**
+     * 获取总共的页数
+     */
+    public int getPageCount() {
+        if (mRecyclerView != null) {
+            if (mOrientation == ORIENTATION.NULL) {
+                return 0;
+            }
+            if (mOrientation == ORIENTATION.VERTICAL && mRecyclerView.computeVerticalScrollExtent() != 0) {
+                return mRecyclerView.computeVerticalScrollRange() / mRecyclerView.computeVerticalScrollExtent();
+            } else if (mRecyclerView.computeHorizontalScrollExtent() != 0) {
+                Log.i("zzz","rang="+mRecyclerView.computeHorizontalScrollRange()+" extent="+mRecyclerView.computeHorizontalScrollExtent());
+                return mRecyclerView.computeHorizontalScrollRange() / mRecyclerView.computeHorizontalScrollExtent();
+            }
+        }
+        return 0;
+    }
+
+
+
     ValueAnimator mAnimator = null;
+
+    public void scrollToPosition(int position) {
+        if (mAnimator == null) {
+            mOnFlingListener.onFling(0, 0);
+        }
+        if (mAnimator != null) {
+            int startPoint = mOrientation == ORIENTATION.VERTICAL ? offsetY : offsetX, endPoint = 0;
+            if (mOrientation == ORIENTATION.VERTICAL) {
+                endPoint = mRecyclerView.getHeight() * position;
+            } else {
+                endPoint = mRecyclerView.getWidth() * position;
+            }
+            if (startPoint != endPoint) {
+                mAnimator.setIntValues(startPoint, endPoint);
+                mAnimator.start();
+            }
+        }
+    }
 
     public class MyOnFlingListener extends RecyclerView.OnFlingListener {
 
@@ -140,6 +179,10 @@ public class PagingScrollHelper {
                         if (null != mOnPageChangeListener) {
                             mOnPageChangeListener.onPageChange(getPageIndex());
                         }
+                        //修复双击item bug
+                        mRecyclerView.stopScroll();
+                        startY = offsetY;
+                        startX = offsetX;
                     }
                 });
             } else {
@@ -195,16 +238,23 @@ public class PagingScrollHelper {
 
     private MyOnTouchListener mOnTouchListener = new MyOnTouchListener();
 
+    private boolean firstTouch = true;
 
     public class MyOnTouchListener implements View.OnTouchListener {
 
         @Override
         public boolean onTouch(View v, MotionEvent event) {
             //手指按下的时候记录开始滚动的坐标
-            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            if (firstTouch) {
+                //第一次touch可能是ACTION_MOVE或ACTION_DOWN,所以使用这种方式判断
+                firstTouch = false;
                 startY = offsetY;
                 startX = offsetX;
             }
+            if (event.getAction() == MotionEvent.ACTION_UP || event.getAction() == MotionEvent.ACTION_CANCEL) {
+                firstTouch = true;
+            }
+
             return false;
         }
 
@@ -212,6 +262,9 @@ public class PagingScrollHelper {
 
     private int getPageIndex() {
         int p = 0;
+        if (mRecyclerView.getHeight() == 0 || mRecyclerView.getWidth() == 0) {
+            return p;
+        }
         if (mOrientation == ORIENTATION.VERTICAL) {
             p = offsetY / mRecyclerView.getHeight();
         } else {
@@ -222,6 +275,10 @@ public class PagingScrollHelper {
 
     private int getStartPageIndex() {
         int p = 0;
+        if (mRecyclerView.getHeight() == 0 || mRecyclerView.getWidth() == 0) {
+            //没有宽高无法处理
+            return p;
+        }
         if (mOrientation == ORIENTATION.VERTICAL) {
             p = startY / mRecyclerView.getHeight();
         } else {

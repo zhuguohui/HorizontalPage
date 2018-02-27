@@ -35,8 +35,6 @@ public class HorizontalPageLayoutManager extends RecyclerView.LayoutManager impl
     }
 
 
-
-
     @Override
     public int scrollHorizontallyBy(int dx, RecyclerView.Recycler recycler, RecyclerView.State state) {
         detachAndScrapAttachedViews(recycler);
@@ -92,8 +90,10 @@ public class HorizontalPageLayoutManager extends RecyclerView.LayoutManager impl
         itemHeightUsed = (rows - 1) * itemHeight;
 
         //计算总的页数
-        pageSize = getItemCount() / onePageSize + (getItemCount() % onePageSize == 0 ? 0 : 1);
 
+//        pageSize = state.getItemCount() / onePageSize + (state.getItemCount() % onePageSize == 0 ? 0 : 1);
+        computePageSize(state);
+        Log.i("zzz", "itemCount=" + getItemCount() + " state itemCount=" + state.getItemCount() + " pageSize=" + pageSize);
         //计算可以横向滚动的最大值
         totalWidth = (pageSize - 1) * getWidth();
 
@@ -138,6 +138,10 @@ public class HorizontalPageLayoutManager extends RecyclerView.LayoutManager impl
         }
 
         recycleAndFillItems(recycler, state);
+    }
+
+    private void computePageSize(RecyclerView.State state) {
+        pageSize = state.getItemCount() / onePageSize + (state.getItemCount() % onePageSize == 0 ? 0 : 1);
     }
 
     @Override
@@ -206,5 +210,21 @@ public class HorizontalPageLayoutManager extends RecyclerView.LayoutManager impl
     public boolean isPageLast(int position) {
         position++;
         return position % onePageSize == 0;
+    }
+
+    @Override
+    public int computeHorizontalScrollRange(RecyclerView.State state) {
+        computePageSize(state);
+        return pageSize * getWidth();
+    }
+
+    @Override
+    public int computeHorizontalScrollOffset(RecyclerView.State state) {
+        return offsetX;
+    }
+
+    @Override
+    public int computeHorizontalScrollExtent(RecyclerView.State state) {
+        return getWidth();
     }
 }

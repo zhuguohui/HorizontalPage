@@ -2,8 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/HorizontalPage.iml" filepath="$PROJECT_DIR$/HorizontalPage.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/HorizontalPage.iml" filepath="$PROJECT_DIR$/.idea/HorizontalPage.iml" />
+      <module fileurl="file://F:\GitHubDemo\HorizontalPage\HorizontalPage.iml" filepath="F:\GitHubDemo\HorizontalPage\HorizontalPage.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://F:\GitHubDemo\HorizontalPage\app\app.iml" filepath="F:\GitHubDemo\HorizontalPage\app\app.iml" />
     </modules>
   </component>
 </project>
